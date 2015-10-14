@@ -14,7 +14,7 @@ Developing and deploying Wordpress with Docker, an http://appcivico.com/ impleme
 
 ### CKAN instance mounts
 
-- ../data-mount-wordpress/var-lib-mysql:/var/lib/mysql/
+- ../data-mount-wordpress/var-lib-mysql/mysql:/var/lib/mysql/
 - ../data-mount-wordpress/var-www:/var/www
 
 
