@@ -1,58 +1,57 @@
-(note: docker-wordpress *no longer* contains an sshd. It was probably a mistake to put one in in the first place, and you can now spawn arbitrary processes with use of the [docker exec](http://blog.docker.com/2014/10/docker-1-3-signed-images-process-injection-security-options-mac-shared-directories/) command. So do that, instead, like this:
+wordpress-docker
+===========
 
-```
-docker exec -i -t docker-wordpress bash
-```
+Developing and deploying Wordpress with Docker, an http://appcivico.com/ implementation.
 
-easy!)
+> this is a fork of https://github.com/jbfink/docker-wordpress but with some different directories and configuration.
 
-(note: [Eugene Ware](http://github.com/eugeneware) has a Docker wordpress container build on nginx with some other goodies; you can check out his work [here](http://github.com/eugeneware/docker-wordpress-nginx).)
+---
+# Usage for deploy a new instance
 
+1. Clone this repository and walk into the directory.
+1. You should edit docker-compose.yml and change where you want to persist the data. default to ../data-mount
+1. `./build-images.sh`     # build the Dockerfiles (go take a coffee)
+1. `docker-compose up --no-recreate -d`
 
-(N.B. the way that Docker handles permissions may vary depending on your current Docker version. If you're getting errors like
-```
-dial unix /var/run/docker.sock: permission denied
-```
-when you run the below commands, simply use sudo. This is a [known issue](https://twitter.com/docker/status/366040073793323008).)
+### CKAN instance mounts
 
-
-This repo contains a recipe for making a [Docker](http://docker.io) container for Wordpress, using Linux, Apache and MySQL. 
-To build, make sure you have Docker [installed](http://www.docker.io/gettingstarted/), clone this repo somewhere, and then run:
-```
-docker build -rm -t <yourname>/wordpress .
-```
-
-Or, alternately, build DIRECTLY from the github repo like some sort of AMAZING FUTURO JULES-VERNESQUE SEA EXPLORER:
-```
-docker build -rm -t <yourname>/wordpress git://github.com/jbfink/docker-wordpress.git
-```
-
-Then run it, specifying your desired ports! Woo! 
-```
-docker run --name wordpress -d -p <http_port>:80 <yourname>/wordpress 
-```
+- ../data-mount-wordpress/var-lib-mysql:/var/lib/mysql/
+- ../data-mount-wordpress/var-www:/var/www
 
 
-Check docker logs after running to see MySQL root password and Wordpress MySQL password, as so
+> WARNING: you need an initialized database on /var/lib/mysql/ otherwise:
 
-```
-echo $(docker logs wordpress | grep password)
-```
+- start docker without mounting mysql directory
+- setup your wordpress
+- docker exec -it $CONTAINERNAME /bin/bash
+- stop the mysql
+- copy the database TAR somwhere in /var/www (so it's mounted)
+- shutdown docker
+- copy and extract database TAR to var-lib-mysql
+- start mounting mysql directory.
 
-(note: you won't need the mysql root or the wordpress db password normally)
+---
 
+## Running commands inside the container
 
-Your wordpress container should now be live, open a web browser and go to http://localhost:<http_port>, then fill out the form. No need to mess with wp-config.php, it's been auto-generated with proper values. 
+The simplest thing to do is to use the `docker exec` command, for example:
 
+    docker exec -it NAME_OF_CONTAINER /bin/bash
 
-You can shutdown your wordpress container like this:
-```
-docker stop wordpress
-```
+## Managing Docker images & containers
 
-And start it back up like this:
-```
-docker start wordpress
-```
+You should use docker-compose to manage your containers & images, this will ensure they are started/stopped in order
 
-Enjoy your wordpress install courtesy of Docker!
+If you want to quickly remove all untagged images:
+
+    docker images -q --filter "dangling=true" | xargs docker rmi
+
+If you want to quickly remove all stopped containers
+
+    docker rm $(docker ps -a -q)
+
+---
+
+# Sources
+- [Docker](https://www.docker.com)
+- [Docker-compose](http://docs.docker.com/compose/)
