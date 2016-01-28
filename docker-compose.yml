@@ -1,7 +1,7 @@
 wordpress:
   build: .
-  hostname: comovamos
-  domainname: eokoe.com
+  hostname: ciudatos
+  domainname: .com
   volumes:
     - ../data-mount-wordpress/var-lib-mysql/mysql:/var/lib/mysql/
     - ../data-mount-wordpress/var-www:/var/www
