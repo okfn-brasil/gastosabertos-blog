@@ -1,8 +1,6 @@
 wordpress-docker
 ===========
 
-Developing and deploying Wordpress with Docker, an http://appcivico.com/ implementation.
-
 > this is a fork of https://github.com/jbfink/docker-wordpress but with some different directories and configuration.
 
 ---
